@@ -25,8 +25,31 @@ async function run() {
     await client.connect();
     const database = client.db("Medical");
     const PrescriptionsCollection = database.collection("Prescriptions");
-    const staffsCollection = database.collection("staffs");
+    const patientCollection = database.collection("patients");
+    const doctorCollection = database.collection("doctors");
     const reportsCollection = database.collection("reports");
+    const idCollection = database.collection("id");
+
+    // GET DATA
+    app.get("/id", async (req, res) => {
+      const id = idCollection.find({});
+      const result = await id.toArray();
+      res.send(result);
+    });
+
+    // GET DATA
+    app.get("/patients", async (req, res) => {
+      const patients = patientCollection.find({});
+      const result = await patients.toArray();
+      res.send(result);
+    });
+
+    // GET DATA
+    app.get("/doctors", async (req, res) => {
+      const doctors = doctorCollection.find({});
+      const result = await doctors.toArray();
+      res.send(result);
+    });
 
     // GET DATA
     app.get("/prescriptions", async (req, res) => {
@@ -34,12 +57,7 @@ async function run() {
       const result = await drug.toArray();
       res.send(result);
     });
-    // GET DATA
-    app.get("/staffs", async (req, res) => {
-      const staff = staffsCollection.find({});
-      const result = await staff.toArray();
-      res.send(result);
-    });
+
     // GET DATA
     app.get("/reports", async (req, res) => {
       const reports = reportsCollection.find({});
@@ -47,16 +65,32 @@ async function run() {
       res.send(result);
     });
 
-    //Add Product
-    app.post("/staffs", async (req, res) => {
-      const staffs = req.body;
+    //Add Patient
+    app.post("/patients", async (req, res) => {
+      const patient = req.body;
       const doc = {
-        type: staffs.type,
-        email: staffs.email,
+        type: patient.type,
+        email: patient.email,
+        name: patient.name,
+        bedId: patient.bedId,
       };
-      const result = await staffsCollection.insertOne(doc);
+      const result = await patientCollection.insertOne(doc);
       res.send(result);
     });
+
+    //Add doctor
+    app.post("/doctors", async (req, res) => {
+      const doctor = req.body;
+      const doc = {
+        type: doctor.type,
+        email: doctor.email,
+        name: doctor.name,
+        slot: 0,
+      };
+      const result = await doctorCollection.insertOne(doc);
+      res.send(result);
+    });
+
     //Add Product
     app.post("/prescriptions", async (req, res) => {
       const prescriptions = req.body;
@@ -69,29 +103,30 @@ async function run() {
       res.send(result);
     });
 
-    // Update
-    app.put("/reports/:id", async (req, res) => {
-      const id = req.params.id;
-      const report = req.body;
-      const filter = { _id: ObjectId(id) };
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: report,
-      };
-      const result = await reportsCollection.updateOne(
-        filter,
-        updateDoc,
-        options
-      );
-      res.send(result);
-    });
-    //Delete Product
-    app.delete("/delete/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await PrescriptionsCollection.deleteOne(query);
-      res.send(result);
-    });
+    // // Update
+    // app.put("/reports/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const report = req.body;
+    //   const filter = { _id: ObjectId(id) };
+    //   const options = { upsert: true };
+    //   const updateDoc = {
+    //     $set: report,
+    //   };
+    //   const result = await reportsCollection.updateOne(
+    //     filter,
+    //     updateDoc,
+    //     options
+    //   );
+    //   res.send(result);
+    // });
+
+    // //Delete Product
+    // app.delete("/delete/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: ObjectId(id) };
+    //   const result = await PrescriptionsCollection.deleteOne(query);
+    //   res.send(result);
+    // });
   } finally {
     // await client.close();
   }
