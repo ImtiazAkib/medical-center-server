@@ -85,6 +85,7 @@ async function run() {
         type: doctor.type,
         email: doctor.email,
         name: doctor.name,
+        licenseId: licenseId,
         slot: 0,
       };
       const result = await doctorCollection.insertOne(doc);
